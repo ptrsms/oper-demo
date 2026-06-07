@@ -16,8 +16,13 @@ def _normalize_database_url(url: str) -> str:
         scheme = "postgresql"
     if scheme == "postgresql":
         scheme = "postgresql+asyncpg"
-    # drop sslmode from query — asyncpg handles SSL via connect_args
-    query = "&".join(p for p in parts.query.split("&") if p and not p.startswith("sslmode="))
+    # Drop libpq-only params asyncpg doesn't understand. We pass SSL via
+    # connect_args in db.py instead.
+    _drop = ("sslmode=", "channel_binding=")
+    query = "&".join(
+        p for p in parts.query.split("&")
+        if p and not any(p.startswith(d) for d in _drop)
+    )
     return urlunsplit((scheme, parts.netloc, parts.path, query, parts.fragment))
 
 
