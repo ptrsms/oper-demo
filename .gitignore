@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Angular
+node_modules/
+web/dist/
+web/.angular/
+web/.nx/
+*.log
+npm-debug.log*
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Build artifacts
+dist/
+build/
+
+# Project-local scratch space
+tmp/
+
+# Vercel
+.vercel
+
+*.pdf
+screenshots/
