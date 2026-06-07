@@ -1,6 +1,7 @@
 from functools import lru_cache
 from urllib.parse import urlsplit, urlunsplit
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,7 +28,17 @@ def _normalize_database_url(url: str) -> str:
 
 
 class Settings(BaseSettings):
-    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/oper_credits"
+    # Read the unpooled URL first (Vercel Neon integration exposes it under several
+    # names; we accept whichever is set). asyncpg + pgbouncer in transaction mode is
+    # a known footgun, so the pooled DATABASE_URL is intentionally LAST.
+    database_url: str = Field(
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/oper_credits",
+        validation_alias=AliasChoices(
+            "POSTGRES_URL_NON_POOLING",
+            "DATABASE_URL_UNPOOLED",
+            "DATABASE_URL",
+        ),
+    )
     jwt_secret: str = "dev-secret-change-me"
     jwt_algorithm: str = "HS256"
     jwt_expires_minutes: int = 60 * 24  # 24h
